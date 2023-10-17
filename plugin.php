@@ -2,15 +2,15 @@
 /**
  * Plugin Template
  *
- * @package     TO FILL
+ * @package     IL Checker
  * @author      Mathieu Lamiot
- * @copyright   TO FILL
+ * @copyright   Internal Link Checker
  * @license     GPL-2.0-or-later
  *
  * @wordpress-plugin
- * Plugin Name: TO FILL
- * Version:     TO FILL
- * Description: TO FILL
+ * Plugin Name: IL Checker
+ * Version:     1.0.0
+ * Description: Use IL checker to examine internal links of your homepage to other page of your site
  * Author:      Mathieu Lamiot
  */
 
