@@ -1,0 +1,69 @@
+# Copyright (C) 2023 Mathieu Lamiot
+# This file is distributed under the same license as the IL Checker plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: IL Checker 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/il-checker\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2023-10-20T15:46:48+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: il-checker\n"
+
+#. Plugin Name of the plugin
+#: src/plugin.php:45
+#: src/plugin.php:46
+msgid "IL Checker"
+msgstr ""
+
+#. Description of the plugin
+msgid "Use IL checker to examine internal links of your homepage to other page of your site"
+msgstr ""
+
+#. Author of the plugin
+msgid "Mathieu Lamiot"
+msgstr ""
+
+#: src/partials/settings.php:3
+msgid "Setting"
+msgstr ""
+
+#: src/partials/settings.php:8
+msgid "Check for links to homepage on other page"
+msgstr ""
+
+#: src/partials/settings.php:21
+msgid "Link status"
+msgstr ""
+
+#: src/partials/settings.php:22
+msgid "Your links from other page to homepage"
+msgstr ""
+
+#: src/partials/settings.php:26
+msgid "S.No."
+msgstr ""
+
+#: src/partials/settings.php:27
+msgid "Linked Page"
+msgstr ""
+
+#: src/partials/settings.php:28
+msgid "Anchor Text"
+msgstr ""
+
+#: src/partials/settings.php:29
+msgid "Linked To"
+msgstr ""
+
+#: src/partials/settings.php:30
+msgid "Last Checked"
+msgstr ""
+
+#: src/plugin.php:95
+msgid "Internal link check started"
+msgstr ""
