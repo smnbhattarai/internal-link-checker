@@ -10,6 +10,7 @@
 
 namespace ROCKET_WP_CRAWLER;
 
+use WP_Error;
 use WP_Query;
 
 /**
@@ -56,7 +57,8 @@ class Rocket_Wpc_Plugin_Class {
 	 * @return void
 	 */
 	public function il_checker_render_settings_page() {
-		$link_results = get_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
+		$link_results   = get_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
+		$homepage_links = get_transient( ROCKET_CRWL_HOMEPAGE_INTERNAL_LINKS );
 		require_once 'partials/settings.php';
 	}
 
@@ -98,18 +100,22 @@ class Rocket_Wpc_Plugin_Class {
 
 	public function start_link_checker_cron() {
 
+		$homepage_url = get_bloginfo( 'url' );
+
+		/**
+		 * Start checking homepage link from internal pages
+		 */
+		$matched_links = array();
 		// Since this is a new request to check link, delete old transient data
 		delete_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
 
-		$homepage_url = get_bloginfo( 'url' );
-
-		$args = array(
-			'post_type'      => array( 'post', 'page' ), // Probably an option to add custom posts type later
-			'post_status'    => 'publish',
-			'posts_per_page' => -1, // Not ideal to fetch all --- might be slow if there are lots of posts
+		$query = new WP_Query(
+			array(
+				'post_type'      => array( 'post', 'page' ), // Probably an option to add custom posts type later
+				'post_status'    => 'publish',
+				'posts_per_page' => -1, // Not ideal to fetch all --- might be slow if there are lots of posts
+			)
 		);
-
-		$query = new WP_Query( $args );
 
 		foreach ( $query->posts as $post ) {
 			$content       = $post->post_content;
@@ -130,12 +136,24 @@ class Rocket_Wpc_Plugin_Class {
 						'last_checked' => current_time( 'mysql' ),
 					);
 
-					set_transient( ROCKET_CRWL_IL_CHECKER_RESULT, $checker_result, 30 * MINUTE_IN_SECONDS );
+					set_transient( ROCKET_CRWL_IL_CHECKER_RESULT, $checker_result, 60 * MINUTE_IN_SECONDS );
 				}
 			}
 		}
 
 		wp_reset_postdata();
+
+		/**
+		 * Start Crawling homepage for other inter links
+		 */
+		delete_transient( ROCKET_CRWL_HOMEPAGE_INTERNAL_LINKS );
+
+		$homepage_links = Rocket_Wpc_Helper::check_homepage_internal_links();
+		if ( ! empty( $homepage_links ) ) {
+			set_transient( ROCKET_CRWL_HOMEPAGE_INTERNAL_LINKS, $homepage_links, 60 * MINUTE_IN_SECONDS );
+		}
+
+		Rocket_Wpc_Helper::generate_sitemap( $matched_links, $homepage_links );
 	}
 
 	/**

@@ -18,7 +18,8 @@
 namespace ROCKET_WP_CRAWLER;
 
 define( 'ROCKET_CRWL_PLUGIN_FILENAME', __FILE__ ); // Filename of the plugin, including the file.
-define( 'ROCKET_CRWL_IL_CHECKER_RESULT', 'il_checker_result' ); // Filename of the plugin, including the file.
+define( 'ROCKET_CRWL_IL_CHECKER_RESULT', 'il_checker_result' );
+define( 'ROCKET_CRWL_HOMEPAGE_INTERNAL_LINKS', 'il_checker_homepage_internal_links' );
 
 if ( ! defined( 'ABSPATH' ) ) { // If WordPress is not loaded.
 	exit( 'WordPress not loaded. Can not load the plugin' );
