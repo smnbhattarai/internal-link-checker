@@ -12,11 +12,13 @@
  * Version:     1.0.0
  * Description: Use IL checker to examine internal links of your homepage to other page of your site
  * Author:      Mathieu Lamiot
+ * Text Domain: il-checker
  */
 
 namespace ROCKET_WP_CRAWLER;
 
 define( 'ROCKET_CRWL_PLUGIN_FILENAME', __FILE__ ); // Filename of the plugin, including the file.
+define( 'ROCKET_CRWL_IL_CHECKER_RESULT', 'il_checker_result' ); // Filename of the plugin, including the file.
 
 if ( ! defined( 'ABSPATH' ) ) { // If WordPress is not loaded.
 	exit( 'WordPress not loaded. Can not load the plugin' );
@@ -26,6 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) { // If WordPress is not loaded.
 require_once __DIR__ . '/src/plugin.php';
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/src/support/exceptions.php';
+require_once __DIR__ . '/src/classes/helpers.php';
 
 // Plugin initialization.
 /**
