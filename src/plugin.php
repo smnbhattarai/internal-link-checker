@@ -182,6 +182,10 @@ class Rocket_Wpc_Plugin_Class {
 		// Remove cron on deactivation.
 		wp_unschedule_event( wp_next_scheduled( 'il_checker_cron_job' ), 'il_checker_cron_job' );
 
+		// Delete transient data.
+		delete_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
+		delete_transient( ROCKET_CRWL_HOMEPAGE_INTERNAL_LINKS );
+
 		// Delete uploads folder.
 		$dir_details = wp_upload_dir();
 		$uploads_dir = trailingslashit( $dir_details['basedir'] );
