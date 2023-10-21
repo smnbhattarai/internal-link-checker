@@ -2,7 +2,7 @@
 /**
  *  Implements the Integration test set for the plugin management.
  *
- * @package     TO FILL
+ * @package     IL Checker
  * @since       TO FILL
  * @author      Mathieu Lamiot
  * @license     GPL-2.0-or-later

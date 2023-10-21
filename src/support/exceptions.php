@@ -2,8 +2,8 @@
 /**
  *  Exception handling
  *
- * @package     TO FILL
- * @since       TO FILL
+ * @package     IL Checker
+ * @since       1.0.0
  * @author      Mathieu Lamiot
  * @license     GPL-2.0-or-later
  */

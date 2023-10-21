@@ -6,6 +6,14 @@ use WP_Error;
 
 class Rocket_Wpc_Helper {
 
+	/**
+	 * Check link on the homepage to see the match.
+	 *
+	 * @param string $post_content post content to check link.
+	 * @param string $homepage_link link to check.
+	 *
+	 * @return array
+	 */
 	public static function check_links( $post_content, $homepage_link ) {
 		$link_details = array();
 		$html         = mb_convert_encoding( $post_content, 'HTML-ENTITIES', 'UTF-8' );
@@ -18,8 +26,8 @@ class Rocket_Wpc_Helper {
 			$links = $document->getElementsByTagName( 'a' );
 			foreach ( $links as $link ) {
 				$href        = $link->getAttribute( 'href' );
-				$anchor_text = $link->textContent;
-				if ( rtrim( $href, '/' ) == rtrim( $homepage_link, '/' ) ) {
+				$anchor_text = $link->textContent; // phpcs:ignore
+				if ( rtrim( $href, '/' ) === rtrim( $homepage_link, '/' ) ) {
 					$link_details[] = array(
 						'href'        => $href,
 						'anchor_text' => $anchor_text,
@@ -31,6 +39,11 @@ class Rocket_Wpc_Helper {
 		return $link_details;
 	}
 
+	/**
+	 * Checks homepage internal links.
+	 *
+	 * @return array
+	 */
 	public static function check_homepage_internal_links() {
 		$link_details = array();
 		$homepage_url = get_bloginfo( 'url' );
@@ -39,7 +52,10 @@ class Rocket_Wpc_Helper {
 
 			$homepage_html = $response['body'];
 
-			file_put_contents( self::li_checker_upload_path( 'index.html' ), $homepage_html );
+			include_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+			global $wp_filesystem;
+			$wp_filesystem->put_contents( self::li_checker_upload_path( 'index.html' ), $homepage_html, FS_CHMOD_FILE );
 
 			$html     = mb_convert_encoding( $homepage_html, 'HTML-ENTITIES', 'UTF-8' );
 			$document = new \DOMDocument();
@@ -51,11 +67,11 @@ class Rocket_Wpc_Helper {
 				$links = $document->getElementsByTagName( 'a' );
 				foreach ( $links as $link ) {
 					$href   = $link->getAttribute( 'href' );
-					$anchor = $link->textContent;
+					$anchor = $link->textContent; // phpcs:ignore
 					if ( strpos( $href, $homepage_url ) === 0 ) {
 						$link_details[] = array(
-							'link'         => $href,
-							'anchor'       => $anchor,
+							'link'         => esc_url( $href ),
+							'anchor'       => sanitize_text_field( $anchor ),
 							'last_checked' => current_time( 'mysql' ),
 						);
 					}
@@ -65,13 +81,23 @@ class Rocket_Wpc_Helper {
 		return $link_details;
 	}
 
+	/**
+	 * Optional file name if full path is required of the file. In other case path to folder is returned.
+	 *
+	 * @param string $filename optional file name.
+	 *
+	 * @return string
+	 */
 	public static function li_checker_upload_path( $filename = null ) {
-		$dirDetails  = wp_upload_dir();
-		$uploads_dir = trailingslashit( $dirDetails['basedir'] );
+		$dir_details = wp_upload_dir();
+		$uploads_dir = trailingslashit( $dir_details['basedir'] );
 
-		// check if directory exists and if not create it
+		// check if directory exists and if not create it.
 		if ( ! file_exists( $uploads_dir . DIRECTORY_SEPARATOR . 'li-checker' ) ) {
-			mkdir( $uploads_dir . DIRECTORY_SEPARATOR . 'li-checker', 0755 );
+			include_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+			global $wp_filesystem;
+			$wp_filesystem->mkdir( $uploads_dir . DIRECTORY_SEPARATOR . 'li-checker', 0755 );
 		}
 
 		$path = $uploads_dir . DIRECTORY_SEPARATOR . 'li-checker' . DIRECTORY_SEPARATOR;
@@ -82,6 +108,14 @@ class Rocket_Wpc_Helper {
 		return $path;
 	}
 
+	/**
+	 * Generates sitemap of links and saves to uploads folder.
+	 *
+	 * @param array $matched_links has links from other page to homepage.
+	 * @param array $homepage_links has links from homepage to other page.
+	 *
+	 * @return void
+	 */
 	public static function generate_sitemap( $matched_links, $homepage_links ) {
 		$links = array();
 		foreach ( $matched_links as $matched_link ) {
@@ -105,7 +139,7 @@ class Rocket_Wpc_Helper {
 				$link_only
 			);
 			if ( ! empty( $link_only ) ) {
-				$links_html .= '<li class="list-group-item"><a target="_blank" href="' . $link . '">' . implode( ' &rarr; ', $link_only ) . '</a></li>';
+				$links_html .= '<li><a target="_blank" href="' . $link . '">' . implode( ' &rarr; ', $link_only ) . '</a></li>';
 			}
 		}
 
@@ -114,25 +148,23 @@ class Rocket_Wpc_Helper {
 		$sitemap = <<<SITEMAP
 		<!doctype html>
 		<html lang="en">
-		  <head>
-		    <meta charset="utf-8">
-		    <meta name="viewport" content="width=device-width, initial-scale=1">
-		    <title>$title</title>
-		    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-		  </head>
-		  <body>
-		  	<div class="container">
-		  		<div class="row">
-		  			<div class="col">
-		  				<h1 class="my-4">Sitemap</h1>
-		    			<ul class="list-group">$links_html</ul>
-					</div>
+			<head>
+			    <meta charset="utf-8">
+			    <meta name="viewport" content="width=device-width, initial-scale=1">
+			    <title>$title</title>
+			</head>
+			<body>
+			    <div>
+				    <h2>Sitemap</h2>
+				    <ul>$links_html</ul>
 				</div>
-			</div>
-		  </body>
+			</body>
 		</html>
-		SITEMAP;
+SITEMAP;
 
-		file_put_contents( self::li_checker_upload_path( 'sitemap.html' ), $sitemap );
+		include_once ABSPATH . 'wp-admin/includes/file.php';
+		WP_Filesystem();
+		global $wp_filesystem;
+		$wp_filesystem->put_contents( self::li_checker_upload_path( 'sitemap.html' ), $sitemap, FS_CHMOD_FILE );
 	}
 }

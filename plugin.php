@@ -30,6 +30,7 @@ require_once __DIR__ . '/src/plugin.php';
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/src/support/exceptions.php';
 require_once __DIR__ . '/src/classes/helpers.php';
+require_once __DIR__ . '/src/classes/admin_notices.php';
 
 // Plugin initialization.
 /**

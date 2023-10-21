@@ -10,7 +10,6 @@
 
 namespace ROCKET_WP_CRAWLER;
 
-use WP_Error;
 use WP_Query;
 
 /**
@@ -24,13 +23,13 @@ class Rocket_Wpc_Plugin_Class {
 	 */
 	public function __construct() {
 
-		// Register link check admin page
+		// Register link check admin page.
 		add_action( 'admin_menu', array( $this, 'il_checker_settings_page' ) );
 
-		// Handle link checker form submit
+		// Handle link checker form submit.
 		add_action( 'admin_init', array( $this, 'start_link_checker_process' ) );
 
-		// Add cron job for checking links
+		// Add cron job for checking links.
 		add_action( 'il_checker_cron_job', array( $this, 'start_link_checker_cron' ) );
 
 		// Register plugin lifecycle hooks.
@@ -57,8 +56,13 @@ class Rocket_Wpc_Plugin_Class {
 	 * @return void
 	 */
 	public function il_checker_render_settings_page() {
-		$link_results   = get_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
-		$homepage_links = get_transient( ROCKET_CRWL_HOMEPAGE_INTERNAL_LINKS );
+		$il_checker_link_results   = get_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
+		$il_checker_homepage_links = get_transient( ROCKET_CRWL_HOMEPAGE_INTERNAL_LINKS );
+
+		if ( empty( $il_checker_link_results ) && empty( $il_checker_homepage_links ) ) {
+			new Rocket_Wpc_Admin_Notice( 'Click on Start Link Check to get the process started.', 'warning' );
+		}
+
 		require_once 'partials/settings.php';
 	}
 
@@ -72,32 +76,24 @@ class Rocket_Wpc_Plugin_Class {
 		if ( isset( $_POST['il-checker-submit'] ) ) {
 			if ( check_admin_referer( 'il-checker' ) ) {
 
-				// Set the cron hook if not already set. If its set run it to update result
+				// Set the cron hook if not already set. If its set run it to update result.
 				if ( ! wp_next_scheduled( 'il_checker_cron_job' ) ) {
 					wp_schedule_event( time(), 'hourly', 'il_checker_cron_job' );
 				} else {
-					do_action( 'il_checker_cron_job' );
+					wp_schedule_single_event( time(), 'il_checker_cron_job' );
 				}
 
-				add_action( 'admin_notices', array( $this, 'admin_notice_check_started' ) );
+				new Rocket_Wpc_Admin_Notice( 'Internal link check started', 'success' );
+
 			}
 		}
 	}
 
 	/**
-	 * Admin success message when form is submitted
-	 * Link check started
+	 * Cron method to generate the link records.
 	 *
 	 * @return void
 	 */
-	public function admin_notice_check_started() {
-		printf(
-			'<div class="notice notice-success is-dismissible"><p>%s: %s</p></div>',
-			'Success',
-			__( 'Internal link check started', 'il-checker' )
-		);
-	}
-
 	public function start_link_checker_cron() {
 
 		$homepage_url = get_bloginfo( 'url' );
@@ -106,14 +102,14 @@ class Rocket_Wpc_Plugin_Class {
 		 * Start checking homepage link from internal pages
 		 */
 		$matched_links = array();
-		// Since this is a new request to check link, delete old transient data
+		// Since this is a new request to check link, delete old transient data.
 		delete_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
 
 		$query = new WP_Query(
 			array(
-				'post_type'      => array( 'post', 'page' ), // Probably an option to add custom posts type later
+				'post_type'      => array( 'post', 'page' ), // Probably an option to add custom posts type later.
 				'post_status'    => 'publish',
-				'posts_per_page' => -1, // Not ideal to fetch all --- might be slow if there are lots of posts
+				'posts_per_page' => -1, // Not ideal to fetch all --- might be slow if there are lots of posts.
 			)
 		);
 
@@ -123,7 +119,7 @@ class Rocket_Wpc_Plugin_Class {
 
 			if ( ! empty( $matched_links ) ) {
 				foreach ( $matched_links as $matched_link ) {
-					// Set transient for matched link
+					// Set transient for matched link.
 					$checker_result = get_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
 					if ( ! $checker_result ) {
 						$checker_result = array();
@@ -131,8 +127,8 @@ class Rocket_Wpc_Plugin_Class {
 
 					$checker_result[] = array(
 						'page_link'    => get_permalink( $post->ID ),
-						'anchor_text'  => $matched_link['anchor_text'],
-						'linked_to'    => $matched_link['href'],
+						'anchor_text'  => sanitize_text_field( $matched_link['anchor_text'] ),
+						'linked_to'    => sanitize_url( $matched_link['href'] ),
 						'last_checked' => current_time( 'mysql' ),
 					);
 
@@ -183,8 +179,11 @@ class Rocket_Wpc_Plugin_Class {
 		$plugin = isset( $_REQUEST['plugin'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['plugin'] ) ) : '';
 		check_admin_referer( "deactivate-plugin_{$plugin}" );
 
-		// Remove cron on deactivation
+		// Remove cron on deactivation.
 		wp_unschedule_event( wp_next_scheduled( 'il_checker_cron_job' ), 'il_checker_cron_job' );
+
+		// Delete uploads folder.
+		wp_delete_file( Rocket_Wpc_Helper::li_checker_upload_path() );
 	}
 
 	/**
