@@ -59,10 +59,6 @@ class Rocket_Wpc_Plugin_Class {
 		$il_checker_link_results   = get_transient( ROCKET_CRWL_IL_CHECKER_RESULT );
 		$il_checker_homepage_links = get_transient( ROCKET_CRWL_HOMEPAGE_INTERNAL_LINKS );
 
-		if ( empty( $il_checker_link_results ) && empty( $il_checker_homepage_links ) ) {
-			new Rocket_Wpc_Admin_Notice( 'Click on Start Link Check to get the process started.', 'warning' );
-		}
-
 		require_once 'partials/settings.php';
 	}
 
