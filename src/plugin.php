@@ -183,7 +183,12 @@ class Rocket_Wpc_Plugin_Class {
 		wp_unschedule_event( wp_next_scheduled( 'il_checker_cron_job' ), 'il_checker_cron_job' );
 
 		// Delete uploads folder.
-		wp_delete_file( Rocket_Wpc_Helper::li_checker_upload_path() );
+		$dir_details = wp_upload_dir();
+		$uploads_dir = trailingslashit( $dir_details['basedir'] );
+		include_once ABSPATH . 'wp-admin/includes/file.php';
+		WP_Filesystem();
+		global $wp_filesystem;
+		$wp_filesystem->rmdir( $uploads_dir . DIRECTORY_SEPARATOR . 'li-checker', true );
 	}
 
 	/**

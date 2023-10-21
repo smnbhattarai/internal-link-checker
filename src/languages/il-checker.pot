@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-10-20T15:46:48+00:00\n"
+"POT-Creation-Date: 2023-10-21T18:13:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: il-checker\n"
@@ -36,34 +36,42 @@ msgstr ""
 msgid "Check for links to homepage on other page"
 msgstr ""
 
+#: src/partials/settings.php:20
+msgid "Homepage internal links"
+msgstr ""
+
 #: src/partials/settings.php:21
-msgid "Link status"
+msgid "All internal links from homepage to your internal pages"
 msgstr ""
 
-#: src/partials/settings.php:22
-msgid "Your links from other page to homepage"
-msgstr ""
-
-#: src/partials/settings.php:26
+#: src/partials/settings.php:25
+#: src/partials/settings.php:52
 msgid "S.No."
 msgstr ""
 
-#: src/partials/settings.php:27
+#: src/partials/settings.php:26
+#: src/partials/settings.php:53
 msgid "Linked Page"
 msgstr ""
 
-#: src/partials/settings.php:28
+#: src/partials/settings.php:27
+#: src/partials/settings.php:54
 msgid "Anchor Text"
 msgstr ""
 
-#: src/partials/settings.php:29
-msgid "Linked To"
-msgstr ""
-
-#: src/partials/settings.php:30
+#: src/partials/settings.php:28
+#: src/partials/settings.php:56
 msgid "Last Checked"
 msgstr ""
 
-#: src/plugin.php:95
-msgid "Internal link check started"
+#: src/partials/settings.php:47
+msgid "Link status"
+msgstr ""
+
+#: src/partials/settings.php:48
+msgid "Your links from other page to homepage"
+msgstr ""
+
+#: src/partials/settings.php:55
+msgid "Linked To"
 msgstr ""
